@@ -108,7 +108,7 @@ class VehicleStore {
     }
 
     func fetchVehciles(completion: @escaping (VehicleResult) -> Void) {
-        
+
         let url = VehicleAPI.nearbyVehicleURL
         let request = URLRequest(url: url)
         let task = session.dataTask(with: request, completionHandler: {
@@ -122,4 +122,17 @@ class VehicleStore {
         task.resume()
     }
 
+    func reserveVehicle(_ vehicle: Vehicle, completion: @escaping (VehicleResult) -> Void) {
+//        let url = VehicleAPI.reserveVehicle(vehicle)
+//        let request = URLRequest(url: url)
+//        let task = session.dataTask(with: request, completionHandler: {
+//            (data, response, error) -> Void in
+//
+//            let result = self.processVehicleRequest(data: data, error: error)
+//            OperationQueue.main.addOperation {
+//                completion(result)
+//            }
+//        })
+//        task.resume()
+    }
 }
