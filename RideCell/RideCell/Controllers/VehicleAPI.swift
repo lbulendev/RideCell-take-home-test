@@ -24,6 +24,10 @@ struct VehicleAPI {
  //       return vehicleURL(parameters: ["sort_by": "popularity.desc"])
     }
 
+    func reserveVehicle(_ vehicle: Vehicle) -> URL {
+        return VehicleAPI.vehicleURL(parameters: ["vehicle": vehicle.id])
+    }
+
     private static func vehicleURL(parameters: [String:String]?) -> URL {
         var components = URLComponents(string: baseURLString)!
         

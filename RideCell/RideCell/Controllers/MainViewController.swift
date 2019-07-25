@@ -17,8 +17,16 @@ class MainViewController: UIViewController, UICollectionViewDelegate, MKMapViewD
     @IBOutlet weak var driverLabel: UILabel!
     @IBOutlet weak var fuelLabel: UILabel!
     @IBOutlet weak var reserveButton: UIButton!
+
+    @IBAction func reserveCarButtonClicked(_ sender: Any) {
+        if selectedVehicle != nil {
+            print("selected Car.license plate: \(selectedVehicle!.licensePlate)")
+        }
+    }
+
     var vehicleDataSource = VehicleDataSource()
     var store: VehicleStore!
+    var selectedVehicle: Vehicle? = nil
 
     required init?(coder aDecoder: NSCoder) {
         store = VehicleStore()
@@ -54,42 +62,52 @@ class MainViewController: UIViewController, UICollectionViewDelegate, MKMapViewD
     }
 
     func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
-//        guard annotation is MKMarkerAnnotationView else { return nil }
         guard annotation is MKPointAnnotation else { return nil }
 
         let identifier = "Annotation"
         var annotationView = mapView.dequeueReusableAnnotationView(withIdentifier: identifier)
 
         if annotationView == nil {
- //           annotationView = MKMarkerAnnotationView(annotation: annotation, reuseIdentifier: identifier)
-            annotationView = MKPinAnnotationView(annotation: annotation, reuseIdentifier: identifier)
+            annotationView = ImageAnnotationView(annotation: annotation, reuseIdentifier: identifier)
             annotationView!.canShowCallout = true
-//            annotationView!.image = UIImage.init(named: "MapPin")?.resizeImageWith(newSize: CGSize.init(width: 50.0, height: 50.0))
             annotationView!.image = UIImage.init(named: "MapPin")?.resizeImageWith(newSize: CGSize.init(width: 50.0, height: 50.0))
         } else {
             annotationView!.annotation = annotation
-//            annotationView!.image = UIImage.init(named: "uhaul-pickup")?.resizeImageWith(newSize: CGSize.init(width: 50.0, height: 50.0))
-////            annotationView!.image = UIImage.init(named: "MapPin")?.resizeImageWith(newSize: CGSize.init(width: 50.0, height: 50.0))
-//
         }
-//
         return annotationView
+    }
+
+    func mapView(_ mapView: MKMapView, didSelect view: MKAnnotationView) {
+        guard view is ImageAnnotationView else { return }
+        if let annotationTitle = view.annotation?.title
+        {
+            for vehicle in self.vehicleDataSource.vehicles {
+                if annotationTitle == vehicle.licensePlate {
+                    selectedVehicle = vehicle
+                    tappedCellAnnotation()
+                }
+            }
+        }
     }
 
     func collectionView(_ collectionView: UICollectionView,
                         didSelectItemAt indexPath: IndexPath) {
         for annotations_item in mapView.annotations{
             
-            if annotations_item.title == self.vehicleDataSource.vehicles[indexPath.row].licensePlate{
+            if annotations_item.title == self.vehicleDataSource.vehicles[indexPath.row].licensePlate {
                 self.mapView.selectAnnotation(annotations_item, animated: true)
             }
             
         }
-        let vehicle = self.vehicleDataSource.vehicles[indexPath.row]
-        self.cityMpgLabel.text = String(vehicle.fuelCap!)
-        self.hwyMpgLabel.text = String(vehicle.fuelLevel!)
-        self.driverLabel.text = String(vehicle.licensePlate)
-        self.fuelLabel.text = String(vehicle.fuelCap!) + "MPG"
+        selectedVehicle = self.vehicleDataSource.vehicles[indexPath.row]
+        tappedCellAnnotation()
+    }
+
+    func tappedCellAnnotation() {
+        self.cityMpgLabel.text = String(selectedVehicle!.fuelCap!)
+        self.hwyMpgLabel.text = String(selectedVehicle!.fuelLevel!)
+        self.driverLabel.text = String(selectedVehicle!.licensePlate)
+        self.fuelLabel.text = String(selectedVehicle!.fuelCap!) + "MPG"
     }
 }
 
